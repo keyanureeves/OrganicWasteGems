@@ -13,6 +13,7 @@
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^6.1.0",
     "@parity/hardhat-polkadot": "^0.1.9",
+    "dockerode": "^4.0.9",
     "hardhat": "^2.27.0"
   },
   "dependencies": {
