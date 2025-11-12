@@ -47,6 +47,7 @@ module.exports = {
                 fallbackOz: true,
                 runs: 200,
             },
+            viaIR: true,
             standardJson: true,
         },
     },
