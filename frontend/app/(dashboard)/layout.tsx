@@ -1,10 +1,11 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
-import { Menu, X, Wallet, Home, Coins, Leaf, TrendingUp, User } from "lucide-react"
+import { Menu, X, Home, Coins, Leaf, TrendingUp, User } from "lucide-react"
 import Link from "next/link"
+import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { useAccount } from 'wagmi'
 
 export default function DashboardLayout({
   children,
@@ -12,8 +13,7 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const [sidebarOpen, setMobileOpen] = useState(false)
-  const walletAddress = "0x742d35Cc6634C0532925a3b844Bc9e7595f42e11"
-  const shortAddress = `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+  const { address, isConnected } = useAccount()
 
   const navItems = [
     { icon: Home, label: "Dashboard", href: "/dashboard" },
@@ -55,16 +55,24 @@ export default function DashboardLayout({
             ))}
           </nav>
 
-          {/* Connect Wallet Button */}
-          <button className="w-full px-4 py-3 rounded-xl bg-accent text-accent-foreground font-semibold neomorph-outset neomorph-hover flex items-center justify-center gap-2 transition-all duration-200">
-            <Wallet className="w-5 h-5" />
-            Connect Wallet
-          </button>
+          {/* RainbowKit Connect Button - Simplified */}
+          <div className="mt-4">
+            <ConnectButton 
+              accountStatus="address"
+              chainStatus="icon"
+              showBalance={false}
+            />
+          </div>
         </div>
       </aside>
 
       {/* Mobile overlay */}
-      {sidebarOpen && <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={() => setMobileOpen(false)} />}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
 
       {/* Main content */}
       <main className="md:ml-64">
@@ -84,13 +92,24 @@ export default function DashboardLayout({
 
             {/* Wallet info and profile */}
             <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground">Connected Wallet</p>
-                <p className="font-mono font-semibold text-foreground">{shortAddress}</p>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent/20 to-secondary/20 neomorph-inset flex items-center justify-center">
-                <User className="w-6 h-6 text-accent" />
-              </div>
+              {isConnected && address ? (
+                <>
+                  <div className="text-right hidden md:block">
+                    <p className="text-sm text-muted-foreground">Connected Wallet</p>
+                    <p className="font-mono font-semibold text-foreground">
+                      {`${address.slice(0, 6)}...${address.slice(-4)}`}
+                    </p>
+                  </div>
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent/20 to-secondary/20 neomorph-inset flex items-center justify-center">
+                    <User className="w-6 h-6 text-accent" />
+                  </div>
+                </>
+              ) : (
+                <div className="text-right hidden md:block">
+                  <p className="text-sm text-muted-foreground">Not Connected</p>
+                  <p className="font-semibold text-foreground">Connect your wallet</p>
+                </div>
+              )}
             </div>
           </div>
         </header>
