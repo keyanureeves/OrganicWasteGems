@@ -1,0 +1,10 @@
+// Export all hooks from a single file for easier imports
+export { useOWGContract } from './useContract'
+export { useRegister } from './useRegister'
+export { useProcessWaste } from './useProcessWaste'
+export { useClaimTokens } from './useClaimTokens'
+export { useFarmerData } from './useFarmerData'
+export { useTokenBalance } from './useTokenBalance'
+export { useGlobalStats } from './useGlobalStats'
+export { useCarbonCredits } from './useCarbonCredits'
+export { useWasteHistory } from './useWasteHistory'

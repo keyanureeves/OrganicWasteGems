@@ -1,210 +1,272 @@
 "use client"
 
-import type React from "react"
 import { useState } from "react"
-import { Leaf, CheckCircle, AlertCircle } from "lucide-react"
+import { Leaf, Loader2, CheckCircle, AlertCircle, Users, DollarSign } from "lucide-react"
+import { useAccount } from "wagmi"
+import { useProcessWaste, useRegister } from "@/lib/hooks"
+import type { ProcessWasteInput } from "@/types/contract"
 
 export default function ProcessWastePage() {
-  const [farmerAddress, setFarmerAddress] = useState("")
-  const [wasteType, setWasteType] = useState("Organic")
-  const [wasteQuantity, setWasteQuantity] = useState("")
-  const [processingLocation, setProcessingLocation] = useState("")
-  const [processingDate, setProcessingDate] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null)
+  const { address, isConnected } = useAccount()
+  const { isRegistered } = useRegister()
+  const { processWaste, isPending, isConfirming, isConfirmed, error } = useProcessWaste()
 
-  const wasteTypes = ["Organic", "Plastic", "Paper", "Metal", "Mixed"]
+  const [formData, setFormData] = useState<ProcessWasteInput>({
+    collectedWasteKg: 0,
+    wasteType: "",
+    workersInvolved: 0,
+    workersPaymentKES: 0,
+  })
 
-  const handleProcessWaste = async (e: React.FormEvent) => {
+  const [showSuccess, setShowSuccess] = useState(false)
+
+  // Calculate rewards
+  const calculateRewards = () => {
+    const tokens = Math.floor(formData.collectedWasteKg / 10)
+    const co2 = formData.collectedWasteKg * 0.4 // 400g = 0.4kg per kg
+    return { tokens, co2 }
+  }
+
+  const rewards = calculateRewards()
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-    setFeedback(null)
 
-    console.log("[v0] Processing waste:", {
-      farmerAddress,
-      wasteType,
-      wasteQuantity,
-      processingLocation,
-      processingDate,
-    })
+    try {
+      await processWaste(formData)
+      setShowSuccess(true)
+      
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setFormData({
+          collectedWasteKg: 0,
+          wasteType: "",
+          workersInvolved: 0,
+          workersPaymentKES: 0,
+        })
+        setShowSuccess(false)
+      }, 5000)
+    } catch (err) {
+      console.error("Error processing waste:", err)
+    }
+  }
 
-    setTimeout(() => {
-      if (farmerAddress && wasteType && wasteQuantity && processingLocation && processingDate) {
-        setFeedback({
-          type: "success",
-          message: `Successfully recorded ${wasteQuantity}kg of ${wasteType} waste at ${processingLocation}`,
-        })
-        // Reset form
-        setFarmerAddress("")
-        setWasteType("Organic")
-        setWasteQuantity("")
-        setProcessingLocation("")
-        setProcessingDate("")
-      } else {
-        setFeedback({
-          type: "error",
-          message: "Please fill in all fields",
-        })
-      }
-      setLoading(false)
-    }, 800)
+  const handleInputChange = (field: keyof ProcessWasteInput, value: string | number) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
+  }
+
+  // Not connected
+  if (!isConnected) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center space-y-4">
+          <AlertCircle className="w-16 h-16 text-muted-foreground mx-auto" />
+          <h2 className="text-2xl font-bold text-foreground">Connect Your Wallet</h2>
+          <p className="text-muted-foreground">
+            Please connect your wallet to process waste
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Not registered
+  if (!isRegistered) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center space-y-4">
+          <AlertCircle className="w-16 h-16 text-muted-foreground mx-auto" />
+          <h2 className="text-2xl font-bold text-foreground">Registration Required</h2>
+          <p className="text-muted-foreground">
+            You need to register as a farmer first
+          </p>
+          <a
+            href="/dashboard"
+            className="inline-block px-6 py-3 rounded-xl bg-accent text-accent-foreground font-semibold neomorph-outset neomorph-hover transition-all duration-200"
+          >
+            Go to Dashboard
+          </a>
+        </div>
+      </div>
+    )
+  }
+
+  // Success state
+  if (showSuccess && isConfirmed) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="neomorph-card p-8 rounded-3xl bg-card border border-border max-w-md">
+          <div className="text-center space-y-6">
+            <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto">
+              <CheckCircle className="w-10 h-10 text-green-500" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-foreground mb-2">Waste Processed!</h2>
+              <p className="text-muted-foreground mb-4">
+                Your waste collection has been successfully recorded
+              </p>
+              <div className="space-y-2 text-left bg-secondary/20 p-4 rounded-lg">
+                <p className="text-sm">
+                  <span className="text-muted-foreground">Tokens Earned:</span>{" "}
+                  <span className="font-bold text-accent">{rewards.tokens} OWG</span>
+                </p>
+                <p className="text-sm">
+                  <span className="text-muted-foreground">CO₂ Saved:</span>{" "}
+                  <span className="font-bold text-green-500">{rewards.co2} kg</span>
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowSuccess(false)}
+              className="w-full px-6 py-3 rounded-xl bg-accent text-accent-foreground font-semibold neomorph-outset neomorph-hover transition-all duration-200"
+            >
+              Process More Waste
+            </button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="space-y-8">
+    <div className="max-w-2xl mx-auto space-y-8">
       {/* Page Header */}
       <div>
         <h1 className="text-4xl font-bold text-foreground mb-2">Process Waste</h1>
-        <p className="text-muted-foreground">Record organic waste collection and processing activities.</p>
+        <p className="text-muted-foreground">
+          Record your waste collection and earn OWG tokens
+        </p>
       </div>
 
-      {/* Process Waste Form Card */}
-      <div className="max-w-2xl mx-auto">
-        <div className="neomorph-outset p-8 rounded-3xl bg-card border border-border">
-          {/* Card Header */}
-          <div className="flex items-center gap-3 mb-8 pb-6 border-b border-border">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-accent/20 to-secondary/20 flex items-center justify-center">
-              <Leaf className="w-6 h-6 text-accent" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-foreground">Log Waste Processing</h2>
-              <p className="text-sm text-muted-foreground">Record processing event details</p>
-            </div>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleProcessWaste} className="space-y-6">
-            {/* Farmer Address Input */}
-            <div className="space-y-2">
-              <label htmlFor="farmer-address" className="block text-sm font-semibold text-foreground">
-                Farmer Address
-              </label>
-              <input
-                id="farmer-address"
-                type="text"
-                placeholder="0x742d35Cc6634C0532925a3b844Bc9e7595f42e11"
-                value={farmerAddress}
-                onChange={(e) => setFarmerAddress(e.target.value)}
-                className="w-full px-4 py-3 rounded-2xl bg-input border border-border text-foreground placeholder-muted-foreground neomorph-inset focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all duration-200"
-              />
-            </div>
-
-            {/* Waste Type Dropdown */}
-            <div className="space-y-2">
-              <label htmlFor="waste-type" className="block text-sm font-semibold text-foreground">
-                Waste Type
-              </label>
-              <select
-                id="waste-type"
-                value={wasteType}
-                onChange={(e) => setWasteType(e.target.value)}
-                className="w-full px-4 py-3 rounded-2xl bg-input border border-border text-foreground neomorph-inset focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all duration-200"
-              >
-                {wasteTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Waste Quantity Input */}
-            <div className="space-y-2">
-              <label htmlFor="waste-quantity" className="block text-sm font-semibold text-foreground">
-                Waste Quantity (kg)
-              </label>
-              <input
-                id="waste-quantity"
-                type="number"
-                placeholder="250"
-                min="0"
-                step="0.1"
-                value={wasteQuantity}
-                onChange={(e) => setWasteQuantity(e.target.value)}
-                className="w-full px-4 py-3 rounded-2xl bg-input border border-border text-foreground placeholder-muted-foreground neomorph-inset focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all duration-200"
-              />
-            </div>
-
-            {/* Processing Location Input */}
-            <div className="space-y-2">
-              <label htmlFor="processing-location" className="block text-sm font-semibold text-foreground">
-                Processing Location
-              </label>
-              <input
-                id="processing-location"
-                type="text"
-                placeholder="Central Processing Facility"
-                value={processingLocation}
-                onChange={(e) => setProcessingLocation(e.target.value)}
-                className="w-full px-4 py-3 rounded-2xl bg-input border border-border text-foreground placeholder-muted-foreground neomorph-inset focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all duration-200"
-              />
-            </div>
-
-            {/* Processing Date Input */}
-            <div className="space-y-2">
-              <label htmlFor="processing-date" className="block text-sm font-semibold text-foreground">
-                Processing Date
-              </label>
-              <input
-                id="processing-date"
-                type="date"
-                value={processingDate}
-                onChange={(e) => setProcessingDate(e.target.value)}
-                className="w-full px-4 py-3 rounded-2xl bg-input border border-border text-foreground neomorph-inset focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all duration-200"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full px-6 py-4 rounded-2xl bg-accent text-accent-foreground font-semibold neomorph-outset neomorph-hover transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-8"
-            >
-              <Leaf className="w-5 h-5" />
-              {loading ? "Processing..." : "Log Waste Processing"}
-            </button>
-          </form>
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="neomorph-card p-8 rounded-3xl bg-card border border-border space-y-6">
+        {/* Waste Amount */}
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-2">
+            Waste Collected (kg) *
+          </label>
+          <input
+            type="number"
+            min="10"
+            step="1"
+            required
+            value={formData.collectedWasteKg || ""}
+            onChange={(e) => handleInputChange("collectedWasteKg", Number(e.target.value))}
+            className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-accent neomorph-inset"
+            placeholder="Enter weight in kg (minimum 10kg)"
+          />
+          <p className="text-xs text-muted-foreground mt-1">Minimum: 10 kg</p>
         </div>
 
-        {/* Feedback Area */}
-        {feedback && (
-          <div
-            className={`mt-6 p-6 rounded-2xl neomorph-card border flex items-start gap-4 ${
-              feedback.type === "success"
-                ? "bg-green-50/20 border-green-200/30 text-green-800"
-                : "bg-red-50/20 border-red-200/30 text-red-800"
-            }`}
+        {/* Waste Type */}
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-2">
+            Waste Type *
+          </label>
+          <select
+            required
+            value={formData.wasteType}
+            onChange={(e) => handleInputChange("wasteType", e.target.value)}
+            className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-accent neomorph-inset"
           >
-            {feedback.type === "success" ? (
-              <CheckCircle className="w-6 h-6 flex-shrink-0 mt-0.5" />
-            ) : (
-              <AlertCircle className="w-6 h-6 flex-shrink-0 mt-0.5" />
-            )}
-            <div>
-              <p className="font-semibold">{feedback.type === "success" ? "Success!" : "Error"}</p>
-              <p className="text-sm mt-1">{feedback.message}</p>
+            <option value="">Select waste type</option>
+            <option value="Food Waste">Food Waste</option>
+            <option value="Garden Waste">Garden Waste</option>
+            <option value="Agricultural Waste">Agricultural Waste</option>
+            <option value="Mixed Organic">Mixed Organic</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        {/* Workers Involved */}
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+            <Users className="w-4 h-4" />
+            Workers Involved
+          </label>
+          <input
+            type="number"
+            min="0"
+            step="1"
+            value={formData.workersInvolved || ""}
+            onChange={(e) => handleInputChange("workersInvolved", Number(e.target.value))}
+            className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-accent neomorph-inset"
+            placeholder="Number of workers"
+          />
+        </div>
+
+        {/* Worker Payment */}
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+            <DollarSign className="w-4 h-4" />
+            Total Payment (KES)
+          </label>
+          <input
+            type="number"
+            min="0"
+            step="1"
+            value={formData.workersPaymentKES || ""}
+            onChange={(e) => handleInputChange("workersPaymentKES", Number(e.target.value))}
+            className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-accent neomorph-inset"
+            placeholder="Total paid to workers"
+          />
+        </div>
+
+        {/* Rewards Preview */}
+        {formData.collectedWasteKg >= 10 && (
+          <div className="neomorph-inset p-6 rounded-xl bg-secondary/10 border border-border">
+            <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+              <Leaf className="w-5 h-5 text-accent" />
+              Estimated Rewards
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Tokens</p>
+                <p className="text-2xl font-bold text-accent">{rewards.tokens} OWG</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">CO₂ Saved</p>
+                <p className="text-2xl font-bold text-green-500">{rewards.co2} kg</p>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Info Section */}
-        <div className="mt-8 p-6 rounded-2xl bg-secondary/5 border border-secondary/20 neomorph-card">
-          <h3 className="font-semibold text-foreground mb-3">How it works</h3>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li className="flex gap-2">
-              <span className="text-accent font-bold">•</span>
-              <span>Record each waste processing event with accurate details</span>
-            </li>
-            <li className="flex gap-2">
-              <span className="text-accent font-bold">•</span>
-              <span>Processing data is verified and stored on-chain</span>
-            </li>
-            <li className="flex gap-2">
-              <span className="text-accent font-bold">•</span>
-              <span>Verified waste logs determine token rewards for farmers</span>
-            </li>
-          </ul>
-        </div>
-      </div>
+        {/* Error Display */}
+        {error && (
+          <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800">
+            <p className="text-sm text-red-600 dark:text-red-400">
+              {error.message}
+            </p>
+          </div>
+        )}
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={isPending || isConfirming || formData.collectedWasteKg < 10 || !formData.wasteType}
+          className="w-full px-6 py-4 rounded-xl bg-accent text-accent-foreground font-semibold neomorph-outset neomorph-hover transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {isPending || isConfirming ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              {isPending ? "Confirm in Wallet..." : "Processing..."}
+            </>
+          ) : (
+            <>
+              <Leaf className="w-5 h-5" />
+              Process Waste Collection
+            </>
+          )}
+        </button>
+
+        <p className="text-xs text-muted-foreground text-center">
+          * Required fields. Transaction will be recorded on the blockchain.
+        </p>
+      </form>
     </div>
   )
 }
