@@ -1,4 +1,20 @@
-export const  contractAddress = "0xf4B40F3B77F727451ce70911B7A9b4bd5eC68070"
+// export const  contractAddress = "0xf4B40F3B77F727451ce70911B7A9b4bd5eC68070"
+
+// Support multiple networks
+export const contractAddresses = {
+  moonbaseAlpha: "0x2a1C1677DAB875425D0a3a0DeeDd1A6F2B751860",  // Deploy on Moonbase first
+  sepolia: "0xA92741eFDB9fe7A6BDE1b54D22311Cb70580dB1d",         // Then deploy on Sepolia
+}
+
+// Helper to get contract address based on chain
+export const getContractAddress = (chainId?: number) => {
+  if (chainId === 1287) return contractAddresses.moonbaseAlpha  // Moonbase Alpha
+  if (chainId === 11155111) return contractAddresses.sepolia    // Sepolia
+  return contractAddresses.moonbaseAlpha // Default
+}
+
+// For backwards compatibility
+export const contractAddress = contractAddresses.moonbaseAlpha
 
 export const CONTRACT_ABI = [
     {
@@ -679,6 +695,25 @@ export const CONTRACT_ABI = [
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_buyer",
+          "type": "address"
+        }
+      ],
+      "name": "getCorporatePurchases",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "getGlobalStats",
       "outputs": [
@@ -870,6 +905,32 @@ export const CONTRACT_ABI = [
     },
     {
       "inputs": [],
+      "name": "minPaymentPerTon",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "minPricePerTon",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
       "name": "name",
       "outputs": [
         {
@@ -932,6 +993,32 @@ export const CONTRACT_ABI = [
     {
       "inputs": [],
       "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_farmer",
+          "type": "address"
+        }
+      ],
+      "name": "revokeVerification",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_minPrice",
+          "type": "uint256"
+        }
+      ],
+      "name": "setMinPricePerTon",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -1071,6 +1158,19 @@ export const CONTRACT_ABI = [
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_farmer",
+          "type": "address"
+        }
+      ],
+      "name": "verifyFarmer",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {

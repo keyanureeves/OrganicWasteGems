@@ -3,13 +3,21 @@
 import { useState } from "react"
 import { Shield, CheckCircle, XCircle, Loader2, AlertCircle, Search, UserCheck } from "lucide-react"
 import { useAccount, useWriteContract, useWaitForTransactionReceipt, useReadContract } from "wagmi"
-import { CONTRACT_ABI, contractAddress } from "@/lib/contracts/abi"
+import { CONTRACT_ABI, getContractAddress } from "@/lib/contracts/abi"
 
 export default function AdminPage() {
-  const { address, isConnected } = useAccount()
+  const { address, isConnected, chainId } = useAccount()
+  const contractAddress = getContractAddress(chainId)
+  
   const [farmerToVerify, setFarmerToVerify] = useState("")
   const [farmerToRevoke, setFarmerToRevoke] = useState("")
   const [checkAddress, setCheckAddress] = useState("")
+
+  console.log('=== ADMIN PAGE DEBUG ===')
+  console.log('Connected:', isConnected)
+  console.log('Address:', address)
+  console.log('Chain ID:', chainId)
+  console.log('Contract Address:', contractAddress)
   
   // Check if current user is owner
   const { data: ownerAddress } = useReadContract({
@@ -17,6 +25,8 @@ export default function AdminPage() {
     abi: CONTRACT_ABI,
     functionName: 'owner',
   })
+
+  console.log('Owner Address:', ownerAddress)
 
   // Verify farmer
   const { 
@@ -60,10 +70,15 @@ export default function AdminPage() {
 
   const isOwner = address && ownerAddress && address.toLowerCase() === (ownerAddress as string).toLowerCase()
 
+  console.log('Is Owner:', isOwner)
+
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!farmerToVerify) return
+    
+    console.log('Verifying farmer:', farmerToVerify)
+    console.log('Using contract:', contractAddress)
     
     verifyFarmer({
       address: contractAddress as `0x${string}`,
@@ -78,6 +93,9 @@ export default function AdminPage() {
     
     if (!farmerToRevoke) return
     
+    console.log('Revoking farmer:', farmerToRevoke)
+    console.log('Using contract:', contractAddress)
+    
     revokeFarmer({
       address: contractAddress as `0x${string}`,
       abi: CONTRACT_ABI,
@@ -88,6 +106,7 @@ export default function AdminPage() {
 
   const handleCheck = () => {
     if (checkAddress) {
+      console.log('Checking farmer:', checkAddress)
       refetchVerification()
     }
   }
@@ -122,6 +141,10 @@ export default function AdminPage() {
             <p className="text-xs font-mono text-foreground break-all">{address}</p>
             <p className="text-xs text-muted-foreground mt-2">Contract Owner:</p>
             <p className="text-xs font-mono text-foreground break-all">{ownerAddress as string}</p>
+            <p className="text-xs text-muted-foreground mt-2">Chain ID:</p>
+            <p className="text-xs font-mono text-foreground">{chainId}</p>
+            <p className="text-xs text-muted-foreground mt-2">Contract Address:</p>
+            <p className="text-xs font-mono text-foreground break-all">{contractAddress}</p>
           </div>
         </div>
       </div>
@@ -134,6 +157,27 @@ export default function AdminPage() {
       <div>
         <h1 className="text-4xl font-bold text-foreground mb-2">Admin Panel</h1>
         <p className="text-muted-foreground">Manage farmer verifications and platform settings</p>
+      </div>
+
+      {/* Debug Info */}
+      <div className="neomorph-inset p-4 rounded-xl bg-blue-500/10 border border-blue-500/30">
+        <h3 className="text-sm font-semibold text-blue-500 mb-2">🔧 Debug Info</h3>
+        <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+          <div>
+            <span className="text-muted-foreground">Chain ID:</span>
+            <span className="text-foreground ml-2">{chainId}</span>
+          </div>
+          <div>
+            <span className="text-muted-foreground">Network:</span>
+            <span className="text-foreground ml-2">
+              {chainId === 1287 ? "Moonbase Alpha" : chainId === 11155111 ? "Sepolia" : "Unknown"}
+            </span>
+          </div>
+          <div className="col-span-2">
+            <span className="text-muted-foreground">Contract:</span>
+            <span className="text-foreground ml-2 break-all">{contractAddress}</span>
+          </div>
+        </div>
       </div>
 
       {/* Owner Badge */}
@@ -183,7 +227,7 @@ export default function AdminPage() {
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">Registration Status</p>
                   <div className="flex items-center gap-2">
-                    {farmerData && (Array.isArray(farmerData) ? farmerData[0] : false) ? (
+                    {farmerData && (farmerData as { isRegistered: boolean }).isRegistered ? (
                       <>
                         <CheckCircle className="w-5 h-5 text-green-500" />
                         <span className="font-semibold text-green-500">Registered</span>
