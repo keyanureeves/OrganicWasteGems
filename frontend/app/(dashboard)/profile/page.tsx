@@ -1,263 +1,262 @@
 "use client"
 
-import { User, Mail, MapPin, Wallet, Edit, Award, TrendingUp, Calendar, Shield } from "lucide-react"
-import { useState } from "react"
+import { User, Leaf, Zap, Coins, Users, DollarSign, Package, Award, Loader2, AlertCircle } from "lucide-react"
+import { useAccount } from "wagmi"
+import { useFarmerData, useTokenBalance, useCarbonCredits, useWasteHistory } from "@/lib/hooks"
+import { formatNumber, gramsToKg, formatKES, formatTimestamp } from "@/lib/utils/contract"
 
 export default function ProfilePage() {
-  const [isEditing, setIsEditing] = useState(false)
-  const [profileData, setProfileData] = useState({
-    name: "John Farmer",
-    email: "john.farmer@organicwaste.io",
-    location: "Karnataka, India",
-    phone: "+91 98765 43210",
-    bio: "Sustainable waste processor and environmental advocate",
-  })
+  const { address, isConnected } = useAccount()
+  const { farmerImpact, isLoading: loadingImpact } = useFarmerData()
+  const { formattedBalance, isLoading: loadingBalance } = useTokenBalance()
+  const { carbonCredits, isLoading: loadingCredits } = useCarbonCredits()
+  const { wasteHistory, isLoading: loadingHistory } = useWasteHistory()
 
-  const [editData, setEditData] = useState(profileData)
+  // Not connected
+  if (!isConnected) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center space-y-4">
+          <AlertCircle className="w-16 h-16 text-muted-foreground mx-auto" />
+          <h2 className="text-2xl font-bold text-foreground">Connect Your Wallet</h2>
+          <p className="text-muted-foreground">
+            Please connect your wallet to view your profile
+          </p>
+        </div>
+      </div>
+    )
+  }
 
-  const handleSave = () => {
-    setProfileData(editData)
-    setIsEditing(false)
+  // Loading state
+  if (loadingImpact || loadingBalance) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center space-y-4">
+          <Loader2 className="w-16 h-16 text-accent animate-spin mx-auto" />
+          <p className="text-muted-foreground">Loading your profile...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="space-y-8">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-4xl font-bold text-foreground mb-2">Profile</h1>
-          <p className="text-muted-foreground">Manage your account information and preferences.</p>
-        </div>
-        <button
-          onClick={() => setIsEditing(!isEditing)}
-          className="px-6 py-3 rounded-xl bg-accent text-accent-foreground font-semibold neomorph-outset neomorph-hover transition-all duration-200 flex items-center gap-2"
-        >
-          <Edit className="w-5 h-5" />
-          {isEditing ? "Cancel" : "Edit Profile"}
-        </button>
+      <div>
+        <h1 className="text-4xl font-bold text-foreground mb-2">Farmer Profile</h1>
+        <p className="text-muted-foreground">Your complete impact and statistics</p>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* Profile Card */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Main Profile Info */}
-          <div className="neomorph-outset p-8 rounded-3xl bg-card border border-border">
-            {/* Profile Header */}
-            <div className="flex items-start gap-6 pb-8 border-b border-border">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent/20 to-secondary/20 flex items-center justify-center flex-shrink-0">
-                <User className="w-10 h-10 text-accent" />
-              </div>
-              <div className="flex-1">
-                <h2 className="text-3xl font-bold text-foreground">{profileData.name}</h2>
-                <p className="text-muted-foreground mt-2">Verified Farmer • Active Since January 2024</p>
-                <div className="flex items-center gap-2 mt-3">
-                  <Shield className="w-5 h-5 text-accent" />
-                  <span className="text-sm font-medium text-accent">KYC Verified</span>
+      {/* Profile Card */}
+      <div className="neomorph-card p-8 rounded-3xl bg-card border border-border">
+        <div className="flex items-center gap-6">
+          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-accent/20 to-secondary/20 neomorph-inset flex items-center justify-center">
+            <User className="w-12 h-12 text-accent" />
+          </div>
+          <div className="flex-1">
+            <h2 className="text-2xl font-bold text-foreground mb-2">Farmer Account</h2>
+            <p className="text-sm font-mono text-muted-foreground break-all">
+              {address}
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-muted-foreground mb-1">Member Status</p>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/20 border border-green-500/30">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+              <span className="text-sm font-semibold text-green-500">Active</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Total Waste */}
+        <div className="neomorph-outset p-6 rounded-2xl bg-card">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center">
+              <Leaf className="w-6 h-6 text-accent" />
+            </div>
+          </div>
+          <p className="text-sm text-muted-foreground mb-1">Total Waste</p>
+          <p className="text-3xl font-bold text-foreground">
+            {farmerImpact ? formatNumber(farmerImpact.wasteKg) : "0"}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">kilograms</p>
+        </div>
+
+        {/* CO2 Saved */}
+        <div className="neomorph-outset p-6 rounded-2xl bg-card">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
+              <Zap className="w-6 h-6 text-green-500" />
+            </div>
+          </div>
+          <p className="text-sm text-muted-foreground mb-1">CO₂ Saved</p>
+          <p className="text-3xl font-bold text-foreground">
+            {farmerImpact ? gramsToKg(farmerImpact.co2Grams) : "0"}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">kilograms</p>
+        </div>
+
+        {/* Tokens Earned */}
+        <div className="neomorph-outset p-6 rounded-2xl bg-card">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center">
+              <Coins className="w-6 h-6 text-accent" />
+            </div>
+          </div>
+          <p className="text-sm text-muted-foreground mb-1">OWG Tokens</p>
+          <p className="text-3xl font-bold text-foreground">
+            {formattedBalance || "0"}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">current balance</p>
+        </div>
+
+        {/* Product Claimed */}
+        <div className="neomorph-outset p-6 rounded-2xl bg-card">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center">
+              <Package className="w-6 h-6 text-accent" />
+            </div>
+          </div>
+          <p className="text-sm text-muted-foreground mb-1">Product</p>
+          <p className="text-3xl font-bold text-foreground">
+            {farmerImpact ? formatNumber(farmerImpact.productKg) : "0"}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">kilograms</p>
+        </div>
+      </div>
+
+      {/* Worker & Payment Stats */}
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="neomorph-card p-6 rounded-3xl bg-card border border-border">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center">
+              <Users className="w-6 h-6 text-accent" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-foreground">Workers Paid</h3>
+              <p className="text-sm text-muted-foreground">Total workers employed</p>
+            </div>
+          </div>
+          <p className="text-4xl font-bold text-foreground">
+            {farmerImpact ? formatNumber(farmerImpact.workersPaid) : "0"}
+          </p>
+        </div>
+
+        <div className="neomorph-card p-6 rounded-3xl bg-card border border-border">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center">
+              <DollarSign className="w-6 h-6 text-accent" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-foreground">Total Payout</h3>
+              <p className="text-sm text-muted-foreground">Amount paid to workers</p>
+            </div>
+          </div>
+          <p className="text-4xl font-bold text-foreground">
+            {farmerImpact ? formatKES(farmerImpact.totalPayoutKES) : "KES 0"}
+          </p>
+        </div>
+      </div>
+
+      {/* Carbon Credits */}
+      {carbonCredits && (
+        <div className="neomorph-card p-8 rounded-3xl bg-card border border-border">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
+              <Award className="w-6 h-6 text-green-500" />
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-foreground">Carbon Credits</h3>
+              <p className="text-sm text-muted-foreground">Your environmental impact credits</p>
+            </div>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">Available</p>
+              <p className="text-3xl font-bold text-green-500">
+                {formatNumber(carbonCredits.availableTons)} tons
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">Total Earned</p>
+              <p className="text-3xl font-bold text-foreground">
+                {formatNumber(carbonCredits.totalEarnedTons)} tons
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">Sold</p>
+              <p className="text-3xl font-bold text-accent">
+                {formatNumber(carbonCredits.soldTons)} tons
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Waste History */}
+      <div className="neomorph-card p-8 rounded-3xl bg-card border border-border">
+        <h3 className="text-xl font-semibold text-foreground mb-6">Collection History</h3>
+        {loadingHistory ? (
+          <div className="text-center py-8">
+            <Loader2 className="w-8 h-8 text-accent animate-spin mx-auto" />
+          </div>
+        ) : wasteHistory && wasteHistory.length > 0 ? (
+          <div className="space-y-4">
+            {wasteHistory.map((collection, index) => (
+              <div
+                key={index}
+                className="neomorph-inset p-4 rounded-xl bg-secondary/10 border border-border"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center">
+                      <Leaf className="w-5 h-5 text-accent" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">{collection.wasteType}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {formatTimestamp(collection.timestamp)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-accent">
+                      {formatNumber(collection.kgCollected)} kg
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-4 mt-3 pt-3 border-t border-border text-sm">
+                  <div>
+                    <span className="text-muted-foreground">Workers:</span>{" "}
+                    <span className="font-semibold text-foreground">
+                      {formatNumber(collection.workersInvolved)}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Payment:</span>{" "}
+                    <span className="font-semibold text-foreground">
+                      {formatKES(collection.workersPaymentKES)}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            {/* Profile Info Fields */}
-            <div className="space-y-6 pt-8">
-              {/* Name */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-foreground">Full Name</label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={editData.name}
-                    onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-input border border-border text-foreground neomorph-inset focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all"
-                  />
-                ) : (
-                  <p className="px-4 py-3 rounded-2xl bg-secondary/5 border border-secondary/20 text-foreground">
-                    {profileData.name}
-                  </p>
-                )}
-              </div>
-
-              {/* Email */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-foreground flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  Email Address
-                </label>
-                {isEditing ? (
-                  <input
-                    type="email"
-                    value={editData.email}
-                    onChange={(e) => setEditData({ ...editData, email: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-input border border-border text-foreground neomorph-inset focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all"
-                  />
-                ) : (
-                  <p className="px-4 py-3 rounded-2xl bg-secondary/5 border border-secondary/20 text-foreground">
-                    {profileData.email}
-                  </p>
-                )}
-              </div>
-
-              {/* Phone */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-foreground">Phone Number</label>
-                {isEditing ? (
-                  <input
-                    type="tel"
-                    value={editData.phone}
-                    onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-input border border-border text-foreground neomorph-inset focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all"
-                  />
-                ) : (
-                  <p className="px-4 py-3 rounded-2xl bg-secondary/5 border border-secondary/20 text-foreground">
-                    {profileData.phone}
-                  </p>
-                )}
-              </div>
-
-              {/* Location */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-foreground flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                  Location
-                </label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={editData.location}
-                    onChange={(e) => setEditData({ ...editData, location: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-input border border-border text-foreground neomorph-inset focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all"
-                  />
-                ) : (
-                  <p className="px-4 py-3 rounded-2xl bg-secondary/5 border border-secondary/20 text-foreground">
-                    {profileData.location}
-                  </p>
-                )}
-              </div>
-
-              {/* Bio */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-foreground">Bio</label>
-                {isEditing ? (
-                  <textarea
-                    value={editData.bio}
-                    onChange={(e) => setEditData({ ...editData, bio: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl bg-input border border-border text-foreground neomorph-inset focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all resize-none"
-                    rows={3}
-                  />
-                ) : (
-                  <p className="px-4 py-3 rounded-2xl bg-secondary/5 border border-secondary/20 text-foreground">
-                    {profileData.bio}
-                  </p>
-                )}
-              </div>
-
-              {/* Save Button */}
-              {isEditing && (
-                <button
-                  onClick={handleSave}
-                  className="w-full px-6 py-3 rounded-2xl bg-accent text-accent-foreground font-semibold neomorph-outset neomorph-hover transition-all duration-200 mt-6"
-                >
-                  Save Changes
-                </button>
-              )}
-            </div>
+            ))}
           </div>
-        </div>
-
-        {/* Stats Sidebar */}
-        <div className="space-y-4">
-          {/* Tier Badge */}
-          <div className="neomorph-outset p-6 rounded-3xl bg-gradient-to-br from-accent/10 to-secondary/10 border border-accent/20">
-            <div className="flex items-center gap-2 mb-3">
-              <Award className="w-6 h-6 text-accent" />
-              <p className="font-semibold text-foreground">Tier Status</p>
-            </div>
-            <p className="text-3xl font-bold text-accent">Gold</p>
-            <p className="text-sm text-muted-foreground mt-2">Top 10% contributor</p>
+        ) : (
+          <div className="text-center py-12">
+            <Leaf className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
+            <p className="text-muted-foreground">No waste collections yet</p>
+            <a
+              href="/process"
+              className="inline-block mt-4 px-6 py-2 rounded-xl bg-accent text-accent-foreground font-semibold neomorph-outset neomorph-hover transition-all duration-200"
+            >
+              Process Your First Collection
+            </a>
           </div>
-
-          {/* Joined Date */}
-          <div className="neomorph-card p-6 rounded-2xl bg-card border border-border">
-            <div className="flex items-center gap-2 mb-3">
-              <Calendar className="w-5 h-5 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground font-medium">Member Since</p>
-            </div>
-            <p className="text-lg font-semibold text-foreground">January 15, 2024</p>
-          </div>
-
-          {/* Wallet Connected */}
-          <div className="neomorph-card p-6 rounded-2xl bg-card border border-border">
-            <div className="flex items-center gap-2 mb-3">
-              <Wallet className="w-5 h-5 text-accent" />
-              <p className="text-sm text-muted-foreground font-medium">Wallet Status</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-green-500" />
-              <p className="font-semibold text-foreground">Connected</p>
-            </div>
-          </div>
-
-          {/* Lifetime Stats */}
-          <div className="neomorph-card p-6 rounded-2xl bg-card border border-border">
-            <div className="flex items-center gap-2 mb-4 pb-4 border-b border-border">
-              <TrendingUp className="w-5 h-5 text-accent" />
-              <p className="font-semibold text-foreground">Lifetime Stats</p>
-            </div>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Waste Processed</span>
-                <span className="font-semibold text-foreground">8,520 kg</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Tokens Earned</span>
-                <span className="font-semibold text-accent">38,340 OWG</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">CO₂ Saved</span>
-                <span className="font-semibold text-foreground">2,556 kg</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Account Settings */}
-      <div className="neomorph-card p-8 rounded-3xl bg-card border border-border">
-        <h2 className="text-2xl font-bold text-foreground mb-6">Account Settings</h2>
-
-        <div className="space-y-4">
-          {/* Password Section */}
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-secondary/5 border border-secondary/20 hover:bg-secondary/10 transition-colors">
-            <div>
-              <p className="font-semibold text-foreground">Password</p>
-              <p className="text-sm text-muted-foreground">Change your password</p>
-            </div>
-            <button className="px-4 py-2 rounded-lg text-accent font-medium hover:bg-accent/10 transition-colors">
-              Update
-            </button>
-          </div>
-
-          {/* 2FA Section */}
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-secondary/5 border border-secondary/20 hover:bg-secondary/10 transition-colors">
-            <div>
-              <p className="font-semibold text-foreground">Two-Factor Authentication</p>
-              <p className="text-sm text-muted-foreground">Add extra security to your account</p>
-            </div>
-            <button className="px-4 py-2 rounded-lg text-accent font-medium hover:bg-accent/10 transition-colors">
-              Enable
-            </button>
-          </div>
-
-          {/* Notifications Section */}
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-secondary/5 border border-secondary/20 hover:bg-secondary/10 transition-colors">
-            <div>
-              <p className="font-semibold text-foreground">Notifications</p>
-              <p className="text-sm text-muted-foreground">Manage your notification preferences</p>
-            </div>
-            <button className="px-4 py-2 rounded-lg text-accent font-medium hover:bg-accent/10 transition-colors">
-              Manage
-            </button>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   )

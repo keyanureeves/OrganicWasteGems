@@ -2,10 +2,10 @@
 
 import type React from "react"
 import { useState } from "react"
-import { Menu, X, Home, Coins, Leaf, TrendingUp, User } from "lucide-react"
+import { Menu, X, Home, Coins, Leaf, TrendingUp, User, Award, Users, History, Shield } from "lucide-react"
 import Link from "next/link"
-import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useAccount } from 'wagmi'
+import { CustomConnectButton } from '@/components/CustomConnectButton'
 
 export default function DashboardLayout({
   children,
@@ -16,12 +16,16 @@ export default function DashboardLayout({
   const { address, isConnected } = useAccount()
 
   const navItems = [
-    { icon: Home, label: "Dashboard", href: "/dashboard" },
-    { icon: Coins, label: "Mint Tokens", href: "/mint" },
-    { icon: Leaf, label: "Process Waste", href: "/process" },
-    { icon: TrendingUp, label: "Balance", href: "/balance" },
-    { icon: User, label: "Profile", href: "/profile" },
-  ]
+  { icon: Home, label: "Dashboard", href: "/dashboard" },
+  { icon: Leaf, label: "Process Waste", href: "/process" },
+  { icon: Coins, label: "Mint Tokens", href: "/mint" },
+  { icon: Award, label: "Carbon Credits", href: "/carbon-credits" },
+  { icon: TrendingUp, label: "Balance", href: "/balance" },
+  { icon: Users, label: "Workers", href: "/workers" },
+  { icon: History, label: "History", href: "/history" },
+  { icon: User, label: "Profile", href: "/profile" },
+  { icon: Shield, label: "Admin", href: "/admin" },  // ← This line
+]
 
   return (
     <div className="min-h-screen bg-background">
@@ -42,7 +46,7 @@ export default function DashboardLayout({
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-2">
+          <nav className="flex-1 space-y-2 overflow-y-auto">
             {navItems.map((item) => (
               <Link
                 key={item.href}
@@ -55,13 +59,9 @@ export default function DashboardLayout({
             ))}
           </nav>
 
-          {/* RainbowKit Connect Button - Simplified */}
+          {/* Custom Connect Button */}
           <div className="mt-4">
-            <ConnectButton 
-              accountStatus="address"
-              chainStatus="icon"
-              showBalance={false}
-            />
+            <CustomConnectButton />
           </div>
         </div>
       </aside>

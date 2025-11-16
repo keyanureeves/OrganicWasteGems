@@ -18,6 +18,9 @@ contract OrganicWasteGems is ERC20, Ownable {
     uint256 public globalWasteKg;
     uint256 public globalCO2Saved; //grams
     uint256 public totalCarbonCreditsSold; //tons
+    uint256 public minPricePerTon = 1000; // Minimum KES per ton
+    uint256 public minPaymentPerTon = 0.0001 ether;
+
 
     // special types
 
@@ -111,6 +114,21 @@ contract OrganicWasteGems is ERC20, Ownable {
         totalFarmers++;
     }
 
+    //set minimum price per ton
+    function setMinPricePerTon(uint256 _minPrice) external onlyOwner {
+        minPricePerTon = _minPrice;
+    }
+
+    function verifyFarmer(address _farmer) external onlyOwner {
+        require(farmers[_farmer].isRegistered, "Farmer not registered");
+        verifiedFarmers[_farmer] = true;
+        emit FarmerVerified(_farmer, block.timestamp);
+    }
+
+    function revokeVerification(address _farmer) external onlyOwner {
+        verifiedFarmers[_farmer] = false;
+    }
+
     //farm processing
     function processWaste(
         uint256 collectedWasteKg,
@@ -179,6 +197,10 @@ contract OrganicWasteGems is ERC20, Ownable {
         uint256 _tonsCO2,
         uint256 _priceKES
     ) external payable {
+        require(_tonsCO2 > 0, "Must purchase at least some credits");
+        require(_priceKES >= minPricePerTon, "Price below minimum");
+        require(farmers[_farmer].isRegistered, "Farmer not registered");
+        
         uint256 co2Grams = _tonsCO2 * 1000000;
         uint256 availableCredits = carbonCreditsEarned[_farmer] -
             carbonCreditsClaimed[_farmer];
@@ -187,14 +209,19 @@ contract OrganicWasteGems is ERC20, Ownable {
             availableCredits >= co2Grams,
             "Insufficient carbon credits available"
         );
+        
+        // Calculate minimum payment required
+        uint256 minPayment = _tonsCO2 * minPaymentPerTon;
+        require(msg.value >= minPayment, "Insufficient payment");
 
-        //mark credits as sold
-
+        // Mark credits as sold
         carbonCreditsClaimed[_farmer] += co2Grams;
         corporateCreditsPurchased[msg.sender] += _tonsCO2;
         totalCarbonCreditsSold += _tonsCO2;
 
-        payable(_farmer).transfer(msg.value); //sends money tbd
+        // Transfer payment to farmer
+        (bool success, ) = payable(_farmer).call{value: msg.value}("");
+        require(success, "Payment transfer failed");
 
         emit CarbonCreditSold(
             _farmer,
@@ -274,6 +301,8 @@ contract OrganicWasteGems is ERC20, Ownable {
         );
     }
 
+    
+
     function getWasteHistory(
         address farmer
     ) external view returns (WasteCollection[] memory) {
@@ -285,4 +314,15 @@ contract OrganicWasteGems is ERC20, Ownable {
     ) external view returns (WorkerPayment[] memory) {
         return workerPayments[farmer];
     }
+
+    function getCorporatePurchases(address _buyer) 
+        external 
+        view 
+        returns (uint256) 
+    {
+        return corporateCreditsPurchased[_buyer];
+    }
+
+    
 }
+

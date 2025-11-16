@@ -1,7 +1,9 @@
-import { useAccount } from 'wagmi'
+import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { useOWGContract } from './useContract'
 import { toBigInt } from '../utils/contract'
+import { parseEther } from 'viem'
 import type { CarbonCredits, BuyCarbonCreditsInput } from '@/types/contract'
+import { CONTRACT_ABI, contractAddress } from '@/lib/contracts/abi'
 
 interface CarbonCreditsData extends Array<bigint> {
   0: bigint
@@ -10,8 +12,13 @@ interface CarbonCreditsData extends Array<bigint> {
 }
 
 export function useCarbonCredits(farmerAddress?: string) {
-  const { address } = useAccount()
-  const { useContractRead, writeToContract, isPending, isConfirming, isConfirmed, writeError } = useOWGContract()
+  const { address, chainId } = useAccount()
+  const { useContractRead } = useOWGContract()
+  // Use imported contractAddress directly
+
+  // Separate write contract hook for payable function
+  const { writeContract, data: hash, isPending, error: writeError } = useWriteContract()
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash })
 
   // Get carbon credits for a specific farmer
   const targetAddress = farmerAddress || address
@@ -29,7 +36,7 @@ export function useCarbonCredits(farmerAddress?: string) {
       }
     : null
 
-  // Buy carbon credits
+  // Buy carbon credits with payment
   const buyCarbonCredits = async (input: BuyCarbonCreditsInput) => {
     const { farmerAddress, tonsCO2, priceKES } = input
 
@@ -38,15 +45,28 @@ export function useCarbonCredits(farmerAddress?: string) {
       throw new Error('Tons must be greater than 0')
     }
 
+    if (!farmerAddress || farmerAddress.length !== 42) {
+      throw new Error('Invalid farmer address')
+    }
+
     // Convert to BigInt
     const tonsBigInt = toBigInt(tonsCO2)
     const priceBigInt = toBigInt(priceKES)
 
-    // Calculate payment in wei (this needs to be adjusted based on your payment logic)
-    const paymentValue = BigInt(priceKES) * BigInt(10 ** 18) // Convert KES to wei equivalent
+    // Calculate payment value in native token (DEV for Moonbase)
+    // Using 0.0001 DEV per ton as minimum payment
+    // Adjust this rate based on your economic model
+    const paymentPerTon = 0.0001 // 0.0001 DEV per ton
+    const paymentValue = parseEther((tonsCO2 * paymentPerTon).toString())
 
-    return writeToContract('buyCarbonCredits', [farmerAddress, tonsBigInt, priceBigInt])
-    // Note: You'll need to add { value: paymentValue } for payable functions
+    // Call the payable function with value
+    return writeContract({
+      address: contractAddress as `0x${string}`,
+      abi: CONTRACT_ABI,
+      functionName: 'buyCarbonCredits',
+      args: [farmerAddress, tonsBigInt, priceBigInt],
+      value: paymentValue, // Send payment with transaction
+    })
   }
 
   return {
@@ -59,5 +79,6 @@ export function useCarbonCredits(farmerAddress?: string) {
     isConfirming,
     isConfirmed,
     buyError: writeError,
+    hash, // Transaction hash for tracking
   }
 }

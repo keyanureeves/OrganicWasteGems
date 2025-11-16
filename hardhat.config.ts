@@ -1,26 +1,42 @@
-require("@nomicfoundation/hardhat-toolbox");
-require("dotenv").config();
+import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox";
+import "dotenv/config";
 
-module.exports = {
+const config: HardhatUserConfig = {
   solidity: "0.8.20",
+
   networks: {
     moonbase: {
-      url: process.env.ALCHEMY_URL,
-      accounts: [process.env.PRIVATE_KEY]
-    }
+      url: process.env.ALCHEMY_URL ?? "https://rpc.api.moonbase.moonbeam.network",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 1287,
+    },
+  },
 
-
+  // ---- Verification (optional but handy for hackathon) ----
+  etherscan: {
+    apiKey: {
+      // Moonscan uses the same key format as Etherscan
+      moonbase: process.env.MOONSCAN_API_KEY ?? "",
+    },
+    customChains: [
+      {
+        network: "moonbase",
+        chainId: 1287,
+        urls: {
+          apiURL: "https://api-moonbase.moonscan.io/api",
+          browserURL: "https://moonbase.moonscan.io",
+        },
+      },
+    ],
   },
 
   sourcify: {
-  enabled: true
-},
-  
-  etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY
-  }
+    enabled: true,
+  },
 };
 
+export default config;
 
 //deployment into polkavm
 
