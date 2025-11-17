@@ -2,19 +2,19 @@
 
 // Support multiple networks
 export const contractAddresses = {
-  moonbaseAlpha: "0x2a1C1677DAB875425D0a3a0DeeDd1A6F2B751860",  // Deploy on Moonbase first
-  sepolia: "0xA92741eFDB9fe7A6BDE1b54D22311Cb70580dB1d",         // Then deploy on Sepolia
+  passetHub: "0xd1D6Bee21BFf794B788D1D0656ED7AD93a3C452b",  // Deploy on Moonbase first
+  // sepolia: "0xA92741eFDB9fe7A6BDE1b54D22311Cb70580dB1d",         // Then deploy on Sepolia
 }
 
 // Helper to get contract address based on chain
 export const getContractAddress = (chainId?: number) => {
-  if (chainId === 1287) return contractAddresses.moonbaseAlpha  // Moonbase Alpha
-  if (chainId === 11155111) return contractAddresses.sepolia    // Sepolia
-  return contractAddresses.moonbaseAlpha // Default
+  if (chainId === 420420422) return contractAddresses.passetHub  // Moonbase Alpha
+  // if (chainId === 11155111) return contractAddresses.sepolia    // Sepolia
+  return contractAddresses.passetHub // Default
 }
 
 // For backwards compatibility
-export const contractAddress = contractAddresses.moonbaseAlpha
+export const contractAddress = contractAddresses.passetHub
 
 export const CONTRACT_ABI = [
     {
