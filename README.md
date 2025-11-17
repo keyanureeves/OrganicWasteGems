@@ -257,7 +257,7 @@ export const contractAddresses = {
 - On the root folder
 
 ```bash
-npm run dev
+npx hardhat run scripts/deploy.js
 ```
 - On the frontend folder 
 
