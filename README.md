@@ -418,24 +418,27 @@ Explorer: 0xd1D6Bee21BFf794B788D1D0656ED7AD93a3C452b
 ## 🎥 Demo
 
 ### Live Demo
-[Insert your deployed URL here]
+https://github.com/keyanureeves/OrganicWasteGems.git
 
 ### Demo Video
-[Insert video walkthrough link]
+https://youtu.be/DcBWd_Y9diA
 
-### Screenshots
+<!-- ### Screenshots
 
 **Dashboard**
-![Dashboard showing farmer statistics]
+C
 
 **Process Waste**
-![Form for submitting waste collection]
+![Process Waste](./assets/OGWProcessWasteMB.png)
 
-**Carbon Credits Marketplace**
-![Marketplace interface for buying/selling credits]
+**Carbon Credits Marketplace Corporate View**
+![Corporate View](./assets/OGWCCMarketPlaceCorpView.png)
+
+**Carbon Credits Marketplace Farmer View**
+![Farmer View](./assets/OGWCCMarketPlaceFarmerView.png)
 
 **Admin Panel**
-![Farmer verification interface]
+![Admin Panel](./assets/OGWAdminPanel.png) -->
 
 ---
 
@@ -519,7 +522,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Documentation](https://docs.google.com/document/d/1-WL-gcIaQ9ViX5o2jqv4mjlZbv-5w-mNGE4URyDWNUU/edit?usp=sharing)
 - [Smart Contract Source](https://github.com/keyanureeves/OrganicWasteGems/tree/main/contracts)
 - [Frontend Source](https://github.com/keyanureeves/OrganicWasteGems/tree/main/frontend)
-- [Hackathon Submission]()
+
 
 ---
 
