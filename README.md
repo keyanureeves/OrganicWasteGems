@@ -236,11 +236,8 @@ For contract deployment, create `.env`:
 PRIVATE_KEY=your_wallet_private_key
 
 # API Keys
-ETHERSCAN_API_KEY=your_etherscan_key
 MOONSCAN_API_KEY=your_moonscan_key
 
-# RPC URLs
-SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY
 ```
 
 ### 4. Update Contract Address
