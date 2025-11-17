@@ -226,16 +226,6 @@ npm install --save-dev hardhat @nomicfoundation/hardhat-toolbox
 
 ### 3. Environment Configuration
 
-Create `.env.local` in the project root:
-
-```bash
-# WalletConnect Project ID (get from https://cloud.walletconnect.com)
-NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id_here
-
-# Contract Addresses (after deployment)
-NEXT_PUBLIC_CONTRACT_ADDRESS_MOONBASE=0xYourMoonbaseAddress
-NEXT_PUBLIC_CONTRACT_ADDRESS_SEPOLIA=0xYourSepoliaAddress
-```
 
 For contract deployment, create `.env`:
 
@@ -263,6 +253,13 @@ export const contractAddresses = {
 ```
 
 ### 5. Run Development Server
+
+- On the root folder
+
+```bash
+npm run dev
+```
+- On the frontend folder 
 
 ```bash
 npm run dev
@@ -493,7 +490,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👥 Team
 
 - **[Osbon Keya]** - Full-stack Developer & Blockchain Engineer
-- **[Ayub Machariah]** - UI/UX Designer
+- **[Ayub Macharia]** - UI/UX Designer
 - **[Catherine Chepkesis]** - Environmentalist
 
 ---
