@@ -445,19 +445,19 @@ Explorer: https://sepolia.etherscan.io/address/0xA92741eFDB9fe7A6BDE1b54D22311Cb
 
 ## 🗺 Future Roadmap
 
-### Phase 2 (Q1 2025)
+### Phase 2 (Q1 2026)
 - [ ] Mobile app (React Native)
 - [ ] Multi-language support (Swahili, French)
 - [ ] Integration with local payment systems (M-Pesa)
 - [ ] QR code verification for waste collection
 
-### Phase 3 (Q2 2025)
+### Phase 3 (Q2 2026)
 - [ ] IoT sensors for automated waste measurement
 - [ ] AI/ML for waste type classification
 - [ ] NFT certificates for carbon credits
 - [ ] Cross-chain bridge to other Polkadot parachains
 
-### Phase 4 (Q3 2025)
+### Phase 4 (Q3 2026)
 - [ ] Mainnet deployment
 - [ ] Partnership with waste management companies
 - [ ] Corporate dashboard for ESG reporting
@@ -473,7 +473,7 @@ Explorer: https://sepolia.etherscan.io/address/0xA92741eFDB9fe7A6BDE1b54D22311Cb
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md).
+We welcome contributions! 
 
 ### Development Process:
 1. Fork the repository
@@ -492,9 +492,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👥 Team
 
-- **[Your Name]** - Full-stack Developer & Blockchain Engineer
-- **[Team Member 2]** - Smart Contract Developer
-- **[Team Member 3]** - UI/UX Designer
+- **[Osbon Keya]** - Full-stack Developer & Blockchain Engineer
+- **[Ayub Machariah]** - UI/UX Designer
+- **[Catherine Chepkesis]** - Environmentalist
 
 ---
 

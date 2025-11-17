@@ -25,7 +25,7 @@ async function main() {
   console.log("OrganicWasteGems deployed to:", contractAddress);
 }
 
-// Run the deployment
+
 main()
   .then(() => process.exit(0))
   .catch((error) => {

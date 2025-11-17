@@ -1,4 +1,4 @@
-// Export all hooks from a single file for easier imports
+// Exporting all hooks from a single file 
 export { useOWGContract } from './useContract'
 export { useRegister } from './useRegister'
 export { useProcessWaste } from './useProcessWaste'

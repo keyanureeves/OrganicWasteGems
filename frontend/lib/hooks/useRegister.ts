@@ -5,7 +5,7 @@ export function useRegister() {
   const { address, chainId } = useAccount()
   const contractAddress = getContractAddress(chainId)
 
-  // Check if user is registered
+  // Checks if user is registered
   const { data: farmerData, isLoading, refetch } = useReadContract({
     address: contractAddress as `0x${string}`,
     abi: CONTRACT_ABI,
@@ -17,7 +17,7 @@ export function useRegister() {
   type FarmerTuple = [boolean, ...unknown[]]
   const isRegistered = farmerData ? (farmerData as unknown as FarmerTuple)[0] : false
 
-  // Write contract for registration
+  // Writes contract for registration
   const { writeContract, data: hash, isPending, error } = useWriteContract()
   
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({

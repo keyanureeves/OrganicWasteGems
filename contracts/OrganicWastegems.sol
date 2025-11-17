@@ -192,6 +192,8 @@ contract OrganicWasteGems is ERC20, Ownable {
         emit ProductClaimed(msg.sender, _productKg, tokens, block.timestamp);
     }
 
+    //future to add mpesa intergration for easier payment strategy for local farmmers 
+
     function buyCarbonCredits(
         address _farmer,
         uint256 _tonsCO2,

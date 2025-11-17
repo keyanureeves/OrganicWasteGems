@@ -34,7 +34,7 @@ export default function Home() {
             </Link>
 
             <a
-              href="https://github.com"
+              href="https://github.com/keyanureeves/OrganicWasteGems.git"
               target="_blank"
               rel="noopener noreferrer"
               className="neomorph-card neomorph-hover px-8 py-4 rounded-2xl bg-card text-foreground font-semibold text-lg border border-border"

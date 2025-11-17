@@ -14,9 +14,9 @@ interface CarbonCreditsData extends Array<bigint> {
 export function useCarbonCredits(farmerAddress?: string) {
   const { address, chainId } = useAccount()
   const { useContractRead } = useOWGContract()
-  // Use imported contractAddress directly
 
-  // Separate write contract hook for payable function
+
+
   const { writeContract, data: hash, isPending, error: writeError } = useWriteContract()
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash })
 
@@ -55,7 +55,6 @@ export function useCarbonCredits(farmerAddress?: string) {
 
     // Calculate payment value in native token (DEV for Moonbase)
     // Using 0.0001 DEV per ton as minimum payment
-    // Adjust this rate based on your economic model
     const paymentPerTon = 0.0001 // 0.0001 DEV per ton
     const paymentValue = parseEther((tonsCO2 * paymentPerTon).toString())
 
