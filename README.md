@@ -33,7 +33,7 @@ A blockchain-based incentivization platform that transforms organic waste manage
 
 Organic Waste Gems (OWG) is a decentralized application built on the Polkadot ecosystem (Moonbeam/Moonbase Alpha) that incentivizes organic waste processing through blockchain technology. The platform creates a transparent, verifiable system where farmers earn cryptocurrency tokens and carbon credits for processing organic waste, while corporations can purchase these carbon credits to offset their emissions.
 
-### Why Polkadot/Moonbeam?
+### Why Polkadot Asset Hub and Moonbeam(MoonbaseAlpha)?
 
 - **EVM Compatibility**: Leverage existing Solidity smart contracts while benefiting from Polkadot's scalability
 - **Low Transaction Costs**: Affordable on-chain operations for farmers in developing regions
@@ -105,6 +105,7 @@ OWG creates a **blockchain-verified, transparent waste-to-value ecosystem** wher
 ## 🛠 Technology Stack
 
 ### Blockchain & Smart Contracts
+- **Polkadot Asset Hub Testnet**:Cross-chain asset management and interoperability
 - **Solidity 0.8.20**: Smart contract development
 - **OpenZeppelin**: Standard ERC20 token implementation and security
 - **Hardhat**: Development environment and deployment
@@ -121,7 +122,8 @@ OWG creates a **blockchain-verified, transparent waste-to-value ecosystem** wher
 ### Web3 Integration
 - **WalletConnect**: Multi-wallet support
 - **MetaMask**: Primary wallet integration
-- **Ethers.js**: Blockchain interactions
+- **Wagmi**: Blockchain interactions
+- **MetaMask**:Primary wallet integration
 
 ### Development Tools
 - **Git/GitHub**: Version control
@@ -248,7 +250,7 @@ Edit `lib/contracts/abi.ts`:
 ```typescript
 export const contractAddresses = {
   moonbaseAlpha: "0xYourDeployedAddress",
-  sepolia: "0xYourDeployedAddress",
+  passetHub: "0xYourDeployedAddress",
 }
 ```
 
@@ -276,7 +278,7 @@ Open [http://localhost:3000](http://localhost:3000)
 #### 1. **Connect Wallet**
 - Click "Connect Wallet" in the sidebar
 - Select MetaMask or WalletConnect
-- Ensure you're on Moonbase Alpha or Sepolia testnet
+- Ensure you're on Moonbase Alpha or Polkadot Asset Hub testnet or the networks are enabled for interactions on the wallet
 
 #### 2. **Register**
 - Navigate to Dashboard
@@ -402,17 +404,17 @@ Chain ID: 1287
 Explorer: https://moonbase.moonscan.io/address/0x2a1C1677DAB875425D0a3a0DeeDd1A6F2B751860
 ```
 
-### Sepolia (Testnet)
+### Polkadot Asset Hub Testnet
 ```
-Contract Address: 0xA92741eFDB9fe7A6BDE1b54D22311Cb70580dB1d
-Network: Sepolia
-Chain ID: 11155111
-Explorer: https://sepolia.etherscan.io/address/0xA92741eFDB9fe7A6BDE1b54D22311Cb70580dB1d
+Contract Address: 0xd1D6Bee21BFf794B788D1D0656ED7AD93a3C452b
+Network: Polkadot Asset Hub Testnet 
+Chain ID: 420420422
+Explorer: 0xd1D6Bee21BFf794B788D1D0656ED7AD93a3C452b
 ```
 
 ### Get Testnet Tokens:
 - **Moonbase DEV**: https://faucet.moonbeam.network/
-- **Sepolia ETH**: https://sepoliafaucet.com/
+- **Pasea PassetHub PAS**: https://faucet.polkadot.io/?parachain=1111
 
 ---
 
@@ -489,15 +491,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👥 Team
 
-- **[Osbon Keya]** - Full-stack Developer & Blockchain Engineer
-- **[Ayub Macharia]** - UI/UX Designer
-- **[Catherine Chepkesis]** - Environmentalist
+- **Osbon Keya** - Full-stack Developer & Blockchain Engineer
+- **Ayub Macharia** - UI/UX Designer
+- **Catherine Chepkesis** - Environmentalist
 
 ---
 
 ## 🙏 Acknowledgments
 
 - **Polkadot** for the hackathon and ecosystem support
+- **Polkadot Asset Hub** for cross-chain asset management
 - **Moonbeam** for EVM compatibility on Polkadot
 - **OpenZeppelin** for secure smart contract libraries
 - **RainbowKit** for excellent wallet connection UX
@@ -507,19 +510,19 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact
 
-- **Project Website**: [Insert URL]
-- **Email**: [Insert email]
-- **Twitter**: [@OrganicWasteGems]
-- **Discord**: [Insert invite link]
+- **Project Website**: https://organic-waste-gems.vercel.app/
+- **Email**: osbonkeya@gmail.com
+
+
 
 ---
 
 ## 🔗 Links
 
-- [Documentation](docs/)
-- [Smart Contract Source](contracts/)
-- [Frontend Source](app/)
-- [Hackathon Submission](https://devpost.com/...)
+- [Documentation](https://docs.google.com/document/d/1-WL-gcIaQ9ViX5o2jqv4mjlZbv-5w-mNGE4URyDWNUU/edit?usp=sharing)
+- [Smart Contract Source](https://github.com/keyanureeves/OrganicWasteGems/tree/main/contracts)
+- [Frontend Source](https://github.com/keyanureeves/OrganicWasteGems/tree/main/frontend)
+- [Hackathon Submission]()
 
 ---
 
