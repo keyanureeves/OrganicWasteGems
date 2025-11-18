@@ -418,7 +418,7 @@ Explorer: 0xd1D6Bee21BFf794B788D1D0656ED7AD93a3C452b
 ## 🎥 Demo
 
 ### Live Demo
-https://github.com/keyanureeves/OrganicWasteGems.git
+https://organic-waste-gems.vercel.app/
 
 ### Demo Video
 https://youtu.be/DcBWd_Y9diA
